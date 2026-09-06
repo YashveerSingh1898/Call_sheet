@@ -1,13 +1,13 @@
 """
-Voice generation module using ElevenLabs Python SDK.
-Converts scene voiceover lines into high-quality spoken audio clips.
+Voice generation module using ElevenLabs and Edge-TTS.
+Converts scene voiceover lines into crystal-clear, high-converting spoken commercial audio.
 """
 
+import asyncio
 import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 from dotenv import find_dotenv, load_dotenv
-from elevenlabs.client import ElevenLabs
 
 # Load environment variables (.env in backend or workspace root)
 env_path = Path(__file__).resolve().parent.parent / ".env"
@@ -16,9 +16,20 @@ if env_path.exists():
 else:
     load_dotenv(find_dotenv())
 
-# Professional, warm default voice (George: JBFqnCBsd6RMkjVDRZzb - Warm, Captivating Storyteller)
-DEFAULT_VOICE_ID = "JBFqnCBsd6RMkjVDRZzb"
-DEFAULT_MODEL_ID = "eleven_multilingual_v2"
+# Professional American commercial voice: Sarah (EXAVITQu4vr4xnSDxMaL) - Crisp, Confident, Reassuring
+DEFAULT_VOICE_ID = "EXAVITQu4vr4xnSDxMaL"
+DEFAULT_MODEL_ID = "eleven_turbo_v2_5"
+FALLBACK_MODEL_ID = "eleven_multilingual_v2"
+
+
+async def _generate_edge_tts_voiceover(text: str, output_path: Path, voice: str = "en-US-ChristopherNeural") -> str:
+    """
+    Generates voiceover audio using high-fidelity Edge-TTS with clear commercial diction.
+    """
+    import edge_tts
+    communicate = edge_tts.Communicate(text=text.strip(), voice=voice, rate="-4%")
+    await communicate.save(str(output_path))
+    return str(output_path.resolve())
 
 
 def generate_single_voiceover(
@@ -29,14 +40,14 @@ def generate_single_voiceover(
     model_id: str = DEFAULT_MODEL_ID
 ) -> str:
     """
-    Converts a single voiceover text line to an MP3 file using ElevenLabs.
+    Converts a single voiceover text line to an MP3 file using ElevenLabs or EdgeTTS.
 
     Args:
         text: Spoken text line for the voiceover.
         output_path: Path where the audio MP3 will be saved.
         api_key: Optional ElevenLabs API key. Defaults to ELEVENLABS_API_KEY env var.
-        voice_id: ElevenLabs voice ID (default: Rachel - warm, professional).
-        model_id: ElevenLabs model ID (default: eleven_multilingual_v2).
+        voice_id: ElevenLabs voice ID.
+        model_id: ElevenLabs model ID.
 
     Returns:
         Absolute path to the saved MP3 audio file.
@@ -44,31 +55,64 @@ def generate_single_voiceover(
     if not text or not text.strip():
         raise ValueError("Cannot generate voiceover for empty text.")
 
-    resolved_api_key = api_key or os.getenv("ELEVENLABS_API_KEY")
-    if not resolved_api_key:
-        raise ValueError(
-            "ELEVENLABS_API_KEY environment variable is not set. "
-            "Please configure it in backend/.env or pass it explicitly."
-        )
-
     save_file = Path(output_path)
     save_file.parent.mkdir(parents=True, exist_ok=True)
 
-    client = ElevenLabs(api_key=resolved_api_key)
+    resolved_api_key = api_key or os.getenv("ELEVENLABS_API_KEY")
 
-    # Call ElevenLabs text-to-speech convert endpoint
-    audio_stream = client.text_to_speech.convert(
-        voice_id=voice_id,
-        text=text.strip(),
-        model_id=model_id,
-        output_format="mp3_44100_128"
-    )
+    # 1. Try ElevenLabs
+    if resolved_api_key:
+        try:
+            from elevenlabs.client import ElevenLabs
+            client = ElevenLabs(api_key=resolved_api_key)
 
-    with open(save_file, "wb") as f:
-        for chunk in audio_stream:
-            f.write(chunk)
+            # Try Turbo model first for fast, crisp audio
+            try:
+                audio_stream = client.text_to_speech.convert(
+                    voice_id=voice_id,
+                    text=text.strip(),
+                    model_id=model_id,
+                    output_format="mp3_44100_128"
+                )
+                with open(save_file, "wb") as f:
+                    for chunk in audio_stream:
+                        f.write(chunk)
+                return str(save_file.resolve())
+            except Exception as turbo_err:
+                print(f"    [VoiceGen Notice] Turbo model error: {turbo_err}. Trying multilingual model...")
+                audio_stream = client.text_to_speech.convert(
+                    voice_id=voice_id,
+                    text=text.strip(),
+                    model_id=FALLBACK_MODEL_ID,
+                    output_format="mp3_44100_128"
+                )
+                with open(save_file, "wb") as f:
+                    for chunk in audio_stream:
+                        f.write(chunk)
+                return str(save_file.resolve())
 
-    return str(save_file.resolve())
+        except Exception as eleven_err:
+            print(f"    [VoiceGen Warning] ElevenLabs synthesis error: {eleven_err}. Falling back to EdgeTTS...")
+
+    # 2. Fallback to EdgeTTS
+    try:
+        asyncio.run(_generate_edge_tts_voiceover(text, save_file))
+        if save_file.exists() and save_file.stat().st_size > 500:
+            return str(save_file.resolve())
+    except Exception as edge_err:
+        print(f"    [VoiceGen Warning] EdgeTTS failed: {edge_err}. Attempting local system speech fallback...")
+
+    # 3. Fallback to macOS local system TTS (/usr/bin/say)
+    try:
+        import subprocess
+        aiff_file = save_file.with_suffix(".aiff")
+        subprocess.run(["/usr/bin/say", "-o", str(aiff_file), text.strip()], check=True)
+        if aiff_file.exists():
+            return str(aiff_file.resolve())
+    except Exception as local_err:
+        print(f"    [VoiceGen Error] Local TTS failed: {local_err}")
+
+    raise RuntimeError("All voice synthesis providers (ElevenLabs, EdgeTTS, local TTS) failed.")
 
 
 def generate_scene_voiceovers(
@@ -79,28 +123,14 @@ def generate_scene_voiceovers(
     model_id: str = DEFAULT_MODEL_ID
 ) -> List[str]:
     """
-    Converts voiceover lines for each scene in the script into audio files.
+    Converts voiceover lines for each scene in the script into crystal-clear audio files.
     Saves each clip to backend/output/audio/scene_{n}.mp3.
-
-    Args:
-        scenes: List of scene dictionaries (from script_gen.py), each with 'scene_number' and 'voiceover_line'.
-        output_dir: Directory where generated audio files are saved. Defaults to backend/output/audio.
-        api_key: Optional ElevenLabs API key. Defaults to ELEVENLABS_API_KEY environment variable.
-        voice_id: ElevenLabs voice identifier (default: Rachel).
-        model_id: ElevenLabs model identifier (default: eleven_multilingual_v2).
 
     Returns:
         List of local file paths (strings) in scene order.
     """
     if not scenes:
         raise ValueError("Scenes list is empty. Nothing to generate.")
-
-    resolved_api_key = api_key or os.getenv("ELEVENLABS_API_KEY")
-    if not resolved_api_key:
-        raise ValueError(
-            "ELEVENLABS_API_KEY environment variable is not set. "
-            "Please configure it in backend/.env or pass it explicitly."
-        )
 
     # Resolve output directory
     if output_dir is None:
@@ -111,7 +141,7 @@ def generate_scene_voiceovers(
     target_dir.mkdir(parents=True, exist_ok=True)
 
     generated_paths: List[str] = []
-    print(f"\n[VoiceGen] Generating voiceovers for {len(scenes)} scenes with voice '{voice_id}'...")
+    print(f"\n[VoiceGen] Synthesizing crystal-clear voiceovers for {len(scenes)} scenes...")
 
     for i, scene in enumerate(scenes):
         scene_num = scene.get("scene_number", i + 1)
@@ -127,11 +157,11 @@ def generate_scene_voiceovers(
         audio_path = generate_single_voiceover(
             text=voiceover_line,
             output_path=save_file,
-            api_key=resolved_api_key,
+            api_key=api_key,
             voice_id=voice_id,
             model_id=model_id
         )
-        print(f"  ✓ Saved to: {audio_path}")
+        print(f"  ✓ Audio track saved: {audio_path}")
         generated_paths.append(audio_path)
 
     print(f"\n[VoiceGen] Successfully generated {len(generated_paths)} audio files.")
@@ -141,11 +171,11 @@ def generate_scene_voiceovers(
 if __name__ == "__main__":
     sample_scene = {
         "scene_number": 1,
-        "voiceover_line": "Craving real refreshment without the sugar crash? Meet Aura Hydrate."
+        "voiceover_line": "Looking for real energy without the mid-day crash? Meet Aura Hydrate."
     }
 
     print("=" * 65)
-    print("Testing Callsheet Voice Generation Module (backend/modules/voice_gen.py)")
+    print("Testing Callsheet Voice Generation Module")
     print(f"Sample voiceover: \"{sample_scene['voiceover_line']}\"")
     print("=" * 65)
 

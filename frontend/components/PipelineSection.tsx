@@ -148,7 +148,7 @@ export default function PipelineSection() {
             <span>4-STAGE AUTONOMOUS PIPELINE</span>
           </div>
           <h2 className="font-display text-3xl sm:text-4xl md:text-5xl text-text-primary font-normal tracking-tight">
-            How Callsheet Generates Broadcast Ads
+            How FrameZero Generates Broadcast Ads
           </h2>
           <p className="font-body text-sm sm:text-base text-text-muted leading-relaxed">
             Our multi-model orchestration pipeline eliminates traditional video editing overhead, 

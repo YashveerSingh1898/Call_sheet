@@ -1,6 +1,6 @@
 """
 Script generation module with multi-model fallback cascade.
-Generates structured video ad scripts with visual descriptions and voiceover lines.
+Generates structured video ad scripts with visual descriptions and crystal-clear voiceover lines.
 """
 
 import json
@@ -21,8 +21,8 @@ else:
 FALLBACK_MODELS = [
     "gemini-3.1-flash-lite",
     "gemini-flash-latest",
+    "gemini-2.5-flash",
     "gemini-3.5-flash",
-    "gemini-3.6-flash",
 ]
 
 
@@ -48,33 +48,32 @@ def _clean_and_parse_json(raw_text: str) -> Dict[str, Any]:
 
 def _generate_dynamic_fallback_script(product_name: str, brief: str) -> Dict[str, List[Dict[str, Any]]]:
     """
-    Generates a commercial script specifically for the provided product and brief
-    if remote API endpoints are temporarily unavailable.
+    Generates a high-converting, natural 4-scene commercial script with simple, crystal-clear voiceover copy.
     """
     return {
         "scenes": [
             {
                 "scene_number": 1,
-                "visual_description": f"Cinematic extreme close-up of {product_name} in warm, dramatic studio lighting with crisp focus.",
-                "voiceover_line": f"Tired of compromise? It's time to upgrade your daily standard with {product_name}.",
+                "visual_description": f"Cinematic close-up of {product_name} with crisp studio lighting and ice-cold condensation.",
+                "voiceover_line": f"Looking for real energy without the mid-day crash? Meet {product_name}.",
                 "duration_seconds": 6
             },
             {
                 "scene_number": 2,
-                "visual_description": f"Dynamic tracking shot showcasing {brief[:80]}, highlighting effortless performance and quality.",
-                "voiceover_line": f"Engineered for real results: {brief[:90]}.",
+                "visual_description": f"Dynamic lifestyle shot showing the struggle of fatigue vs instant refreshment with {brief[:70]}.",
+                "voiceover_line": f"Crafted with pure ingredients to keep you sharp, hydrated, and ready for anything.",
                 "duration_seconds": 6
             },
             {
                 "scene_number": 3,
-                "visual_description": f"Macro lifestyle shot with natural golden hour lighting, radiating confidence, energy, and premium appeal.",
-                "voiceover_line": f"Experience the difference that {product_name} brings to your routine every single day.",
+                "visual_description": f"Vibrant pouring shot with golden sunlight and crystal clear sparkling bubbles.",
+                "voiceover_line": f"Every sip delivers crisp, refreshing flavor with zero artificial shortcuts.",
                 "duration_seconds": 6
             },
             {
                 "scene_number": 4,
-                "visual_description": f"Clean centered hero packshot of {product_name} with bold typography and official brand watermark.",
-                "voiceover_line": f"Discover {product_name} today. Tap the link to get yours now.",
+                "visual_description": f"Hero brand packshot of {product_name} centered against a sleek studio backdrop with bright logo.",
+                "voiceover_line": f"Upgrade your daily routine today. Click below to experience {product_name}.",
                 "duration_seconds": 6
             }
         ]
@@ -89,31 +88,35 @@ def generate_script(
 ) -> Dict[str, List[Dict[str, Any]]]:
     """
     Generates a 4-scene (24s total) ad script using Gemini with automatic multi-model fallback cascade.
+    Voiceover lines are written in clear, simple, broadcast-grade American English.
     """
     resolved_api_key = api_key or os.getenv("GEMINI_API_KEY")
     candidate_models = models or FALLBACK_MODELS
 
-    prompt = f"""You are an award-winning commercial video director and copywriter.
-Create a high-converting, cinematic 20-25 second video advertisement script for:
+    prompt = f"""You are an elite commercial ad director and copywriter.
+Create a high-converting, cinematic 16-20 second video advertisement script (4 scenes, ~4.5 seconds each) for:
 
 Product Name: {product_name}
 Creative Brief: {brief}
 
-Guidelines:
-- Create exactly 4 scenes.
-- Total duration ~24 seconds (each scene ~6 seconds).
-- Visual descriptions must be detailed, vivid, cinematic, and tailored for advertising photography.
-- Voiceover lines must be punchy, natural, and conversational.
-- Progression: Hook (Scene 1) -> Relatability -> Solution/Feature -> Call to Action.
+CRITICAL RULES FOR VOICEOVER LINES:
+1. Speak in simple, crystal-clear, highly engaging spoken language.
+2. Short, punchy, energetic sentences (8 to 12 words maximum per scene).
+3. Highly engaging tone suited to the product and brand.
+4. Scene progression:
+   - Scene 1 (The Hook): A punchy hook or relatable situation highlighting the craving or need.
+   - Scene 2 (The Solution): How {product_name} delivers the perfect answer.
+   - Scene 3 (The Key Delight): Crisp, mouth-watering / exciting description of flavor or power.
+   - Scene 4 (Call to Action): Clear, memorable invitation to visit, taste, or buy now.
 
 Output ONLY a raw JSON object with NO markdown formatting:
 {{
   "scenes": [
     {{
       "scene_number": 1,
-      "visual_description": "Cinematic close-up shot of...",
-      "voiceover_line": "Catchy opening hook line...",
-      "duration_seconds": 6
+      "visual_description": "Vibrant 3D animated cinematic close-up shot of...",
+      "voiceover_line": "Simple, punchy, crystal-clear spoken line...",
+      "duration_seconds": 4.5
     }}
   ]
 }}
@@ -142,7 +145,7 @@ Output ONLY a raw JSON object with NO markdown formatting:
                         print(f"✓ [ScriptGen] Successfully generated script via '{model}'")
                         return parsed
                 else:
-                    print(f"  [Notice] Model '{model}' returned status {response.status_code} ({response.text[:80]}). Trying next model...")
+                    print(f"  [Notice] Model '{model}' returned status {response.status_code}. Trying next model...")
             except Exception as exc:
                 print(f"  [Notice] Error on model '{model}': {exc}. Trying next candidate...")
 

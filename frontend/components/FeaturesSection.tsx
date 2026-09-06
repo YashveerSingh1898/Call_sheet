@@ -227,7 +227,7 @@ export default function FeaturesSection() {
 
                     <div className="pt-3 border-t border-text-muted/10 flex items-center gap-2 text-xs font-mono text-accent-amber">
                       <Sliders className="w-3.5 h-3.5 text-accent-amber" />
-                      <span>Calibrated for Commercial Broadcast by Callsheet v1.0</span>
+                      <span>Calibrated for Commercial Broadcast by FrameZero v1.0</span>
                     </div>
                   </div>
                 )}

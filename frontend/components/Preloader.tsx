@@ -39,7 +39,7 @@ export default function Preloader() {
       <div className="flex items-center justify-between text-xs font-mono text-text-muted">
         <div className="flex items-center gap-2 text-accent-amber">
           <Sparkles className="w-3.5 h-3.5" />
-          <span className="font-semibold tracking-widest uppercase">CALLSHEET STUDIO</span>
+          <span className="font-semibold tracking-widest uppercase">FRAMEZERO STUDIO</span>
         </div>
         <span className="text-[11px] text-accent-teal-bright">WEBGL ENGINE INITIALIZING</span>
       </div>

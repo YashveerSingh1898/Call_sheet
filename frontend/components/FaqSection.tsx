@@ -20,19 +20,19 @@ const FAQS: FaqItem[] = [
     category: "AI MODELS & ARCHITECTURE",
     question: "Which generative models power each production phase?",
     answer:
-      "Callsheet utilizes Google Gemini 1.5 Pro / Flash for structured screenwriting and visual direction; high-resolution image diffusion models for vertical 1080x1920 frames; ElevenLabs Multilingual v2 for human-grade emotive voiceovers; and MoviePy 2.0 with FFmpeg for video compilation, Ken Burns motion, and audio mixing.",
+      "FrameZero utilizes Google Gemini 1.5 Pro / Flash for structured screenwriting and visual direction; high-resolution image diffusion models for vertical 1080x1920 frames; ElevenLabs Multilingual v2 for human-grade emotive voiceovers; and MoviePy 2.0 with FFmpeg for video compilation, Ken Burns motion, and audio mixing.",
   },
   {
     category: "RESILIENCE & FALLBACKS",
     question: "What happens if an external API encounters rate limits or downtime?",
     answer:
-      "Callsheet is engineered with a multi-model fallback cascade. If primary endpoints are temporarily constrained, the orchestrator automatically routes to secondary models (e.g., gemini-3.1-flash-lite, edge-tts neural voiceover, and custom visual canvas renderers) ensuring uninterrupted generation.",
+      "FrameZero is engineered with a multi-model fallback cascade. If primary endpoints are temporarily constrained, the orchestrator automatically routes to secondary models (e.g., gemini-3.1-flash-lite, edge-tts neural voiceover, and custom visual canvas renderers) ensuring uninterrupted generation.",
   },
   {
     category: "COMMERCIAL LICENSING",
     question: "Can I use the generated videos for paid ad campaigns on TikTok and Meta?",
     answer:
-      "Yes. All assets produced by Callsheet—including generative scripts, rendered visuals, synthesized ElevenLabs audio tracks, and royalty-free background soundtracks—are 100% royalty-free and cleared for commercial distribution across Meta, TikTok, YouTube, and digital broadcast channels.",
+      "Yes. All assets produced by FrameZero—including generative scripts, rendered visuals, synthesized ElevenLabs audio tracks, and royalty-free background soundtracks—are 100% royalty-free and cleared for commercial distribution across Meta, TikTok, YouTube, and digital broadcast channels.",
   },
   {
     category: "AUDIO MIXING",
@@ -44,7 +44,7 @@ const FAQS: FaqItem[] = [
     category: "EXPORT CODECS & SPECS",
     question: "What video formats, resolutions, and framerates are produced?",
     answer:
-      "By default, Callsheet outputs standard vertical 1080x1920 MP4 files encoded in H.264 (High Profile) at 30 fps with stereo AAC audio at 320 kbps. This guarantees immediate drag-and-drop compatibility with TikTok Ads Manager, Meta Ads Manager, and Google App Campaigns.",
+      "By default, FrameZero outputs standard vertical 1080x1920 MP4 files encoded in H.264 (High Profile) at 30 fps with stereo AAC audio at 320 kbps. This guarantees immediate drag-and-drop compatibility with TikTok Ads Manager, Meta Ads Manager, and Google App Campaigns.",
   },
 ];
 
@@ -68,7 +68,7 @@ export default function FaqSection() {
             Frequently Asked Questions
           </h2>
           <p className="font-body text-sm sm:text-base text-text-muted leading-relaxed">
-            Everything you need to know about the Callsheet generative engine, model architectures, 
+            Everything you need to know about the FrameZero generative engine, model architectures, 
             audio ducking, and commercial licensing.
           </p>
         </div>

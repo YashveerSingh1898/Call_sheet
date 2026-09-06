@@ -120,13 +120,20 @@ def run_pipeline(
     # -------------------------------------------------------------
     try:
         print("\n[Stage 2/4] Generating scene visuals...")
-        _notify_progress(progress_callback, "images", f"Generating visuals for {len(scenes)} scenes...")
+        _notify_progress(progress_callback, "images", f"Synthesizing visuals for {len(scenes)} scenes...")
         
         image_paths = generate_scene_images(
             scenes=scenes,
             allow_placeholder_fallback=allow_placeholder_fallback
         )
         print(f"✓ Generated {len(image_paths)} scene images")
+
+        # Attach image URLs to scene objects for frontend filmstrip display
+        for idx, scene in enumerate(scenes):
+            if idx < len(image_paths):
+                img_name = Path(image_paths[idx]).name
+                scene["image_url"] = f"/output/images/{img_name}"
+
     except Exception as err:
         print(f"❌ [Stage 2 Failed] Image generation error: {err}")
         _notify_progress(progress_callback, "error", f"Image generation failed: {err}")
@@ -136,7 +143,7 @@ def run_pipeline(
     # Stage 3: Voiceover Generation
     # -------------------------------------------------------------
     try:
-        print("\n[Stage 3/4] Generating voiceover audio clips via ElevenLabs...")
+        print("\n[Stage 3/4] Generating voiceover audio clips...")
         _notify_progress(progress_callback, "voiceover", f"Synthesizing voiceover audio for {len(scenes)} scenes...")
         
         audio_paths = generate_scene_voiceovers(scenes=scenes)
@@ -150,8 +157,8 @@ def run_pipeline(
     # Stage 4: Video Stitching & Audio Mixing
     # -------------------------------------------------------------
     try:
-        print("\n[Stage 4/4] Assembling video, applying Ken Burns zoom, and mixing audio...")
-        _notify_progress(progress_callback, "editing", "Rendering vertical 1080x1920 30fps video...")
+        print("\n[Stage 4/4] Assembling video with subtitles, Ken Burns zoom, and audio...")
+        _notify_progress(progress_callback, "editing", "Rendering vertical 1080x1920 30fps commercial...")
 
         # Resolve background music track
         selected_bg_music = bg_music_path or _find_default_background_music()
@@ -160,12 +167,15 @@ def run_pipeline(
         else:
             print("  No background music track specified (voiceover only).")
 
-        # Extract requested durations
+        # Extract requested durations & voiceover subtitle lines
         scene_durations = [float(s.get("duration_seconds", 0)) for s in scenes]
+        scene_subtitles = [str(s.get("voiceover_line", "")) for s in scenes]
 
         final_video_path = stitch_video(
             image_paths=image_paths,
             audio_paths=audio_paths,
+            subtitles=scene_subtitles,
+            product_name=product_name,
             durations=scene_durations,
             bg_music_path=selected_bg_music,
             output_path=output_video_path or (backend_dir / "output" / "final_ad.mp4")
@@ -179,7 +189,7 @@ def run_pipeline(
     # -------------------------------------------------------------
     # Done
     # -------------------------------------------------------------
-    _notify_progress(progress_callback, "done", "Video generation complete!")
+    _notify_progress(progress_callback, "done", "Commercial video generation complete!")
     print("\n🎉 CALLSHEET PIPELINE COMPLETED SUCCESSFULLY!")
     print(f"  Final Video: {final_video_path}")
     print(f"  Total Scenes: {len(scenes)}")

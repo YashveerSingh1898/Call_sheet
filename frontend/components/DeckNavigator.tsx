@@ -15,7 +15,7 @@ export const DECKS: DeckInfo[] = [
   { id: "pipeline", number: "02", name: "ENGINE", subtitle: "4-Stage Architecture" },
   { id: "features", number: "03", name: "CAPABILITIES", subtitle: "Director Specs" },
   { id: "showcase", number: "04", name: "CASE STUDIES", subtitle: "Commercial Storyboards" },
-  { id: "generator", number: "05", name: "AI STUDIO", subtitle: "Autonomous Workspace" },
+  { id: "studio-gateway", number: "05", name: "AI STUDIO", subtitle: "Launch Production" },
   { id: "faq", number: "06", name: "SPECS & FAQ", subtitle: "Technical Standards" },
 ];
 

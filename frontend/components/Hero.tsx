@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { Sparkles, ArrowDown } from "lucide-react";
 
 export default function Hero() {
@@ -25,7 +26,7 @@ export default function Hero() {
 
         {/* Rich Description */}
         <p className="font-body text-base sm:text-lg md:text-xl text-text-muted leading-relaxed max-w-3xl mx-auto text-balance">
-          Callsheet replaces the traditional weeks-long commercial production cycle with a 
+          FrameZero replaces the traditional weeks-long commercial production cycle with a 
           multimodal generative suite. Simply provide your product name and a creative premise. 
           Our autonomous orchestrator directs the narrative script, synthesizes high-fidelity 
           cinematic visuals, records studio-quality emotive voiceover, aligns audio pacing, and cuts 
@@ -34,13 +35,13 @@ export default function Hero() {
 
         {/* Hero CTAs */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
-          <a
-            href="#generator"
+          <Link
+            href="/studio"
             className="w-full sm:w-auto px-7 py-3.5 rounded-md bg-accent-amber text-bg font-semibold text-sm hover:bg-accent-amber/90 active:bg-accent-amber/80 transition-all flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-amber focus-visible:ring-offset-2 focus-visible:ring-offset-bg shadow-md"
           >
             <Sparkles className="w-4 h-4 fill-current" />
-            <span>Generate Commercial Now</span>
-          </a>
+            <span>Open AI Studio & Create Ad</span>
+          </Link>
           <a
             href="#pipeline"
             className="w-full sm:w-auto px-7 py-3.5 rounded-md bg-surface hover:bg-surface-raised border border-text-muted/30 text-text-primary text-sm font-medium transition-all flex items-center justify-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-amber shadow-sm"

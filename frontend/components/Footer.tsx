@@ -14,7 +14,7 @@ export default function Footer() {
                 <Clapperboard className="w-4 h-4" />
               </div>
               <span className="font-display font-semibold text-text-primary tracking-wider text-base uppercase">
-                Callsheet Studio
+                FrameZero Studio
               </span>
             </div>
             <p className="font-body text-xs text-text-muted leading-relaxed max-w-sm">
@@ -101,7 +101,7 @@ export default function Footer() {
             <span className="px-2 py-0.5 rounded bg-surface border border-text-muted/15">Three.js WebGL</span>
           </div>
 
-          <p>© {new Date().getFullYear()} Callsheet Studio. Designed for broadcast-grade AI video production.</p>
+          <p>© {new Date().getFullYear()} FrameZero Studio. Designed for broadcast-grade AI video production.</p>
         </div>
       </div>
     </footer>

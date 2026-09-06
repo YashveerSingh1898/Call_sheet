@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Lock,
   User,
@@ -20,15 +20,17 @@ import Footer from "@/components/Footer";
 import ThreeAmbientCanvas from "@/components/ThreeAmbientCanvas";
 import ScrambleHeading from "@/components/ScrambleHeading";
 
-export default function RootEntryPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get("redirect") || "/overview";
   const { user, isAuthenticated, login, isLoaded } = useAuth();
 
   useEffect(() => {
     if (isLoaded && isAuthenticated) {
-      router.replace("/overview");
+      router.replace(redirectUrl);
     }
-  }, [isLoaded, isAuthenticated, router]);
+  }, [isLoaded, isAuthenticated, redirectUrl, router]);
 
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [username, setUsername] = useState<string>("");
@@ -55,7 +57,7 @@ export default function RootEntryPage() {
           : `Account @${cleanUsername} created! Launching FrameZero Homepage...`
       );
       setTimeout(() => {
-        router.push("/overview");
+        router.push(redirectUrl);
       }, 400);
     }, 500);
   };
@@ -65,7 +67,7 @@ export default function RootEntryPage() {
     login("demo_director", "demo.director@framezero.ai", "Demo Director");
     setSuccessMessage("Entering as @demo_director... Launching FrameZero Homepage!");
     setTimeout(() => {
-      router.push("/overview");
+      router.push(redirectUrl);
     }, 400);
   };
 
@@ -84,7 +86,7 @@ export default function RootEntryPage() {
               <p className="font-mono text-xs text-accent-teal-bright">Redirecting to FrameZero Homepage...</p>
             </div>
             <Link
-              href="/overview"
+              href={redirectUrl}
               className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-accent-amber text-bg font-mono text-xs font-bold hover:bg-accent-amber/90 transition-all"
             >
               <span>Click here if not redirected</span>
@@ -99,13 +101,13 @@ export default function RootEntryPage() {
 
   return (
     <div className="relative min-h-screen flex flex-col justify-between selection:bg-accent-amber/30 selection:text-text-primary bg-bg text-text-primary overflow-hidden">
-      {/* 1. Ambient Three.js Background (Ethereal particles & light waves — NO solid 3D objects) */}
+      {/* 1. Ambient Three.js Background (No solid 3D objects) */}
       <ThreeAmbientCanvas />
 
-      {/* 2. Global Navigation */}
+      {/* 2. Top Navigation */}
       <Navbar />
 
-      {/* 3. Main Center Stage */}
+      {/* 3. Main Stage */}
       <main className="relative z-10 w-full flex-1 flex flex-col items-center justify-center pt-24 pb-12 px-4 sm:px-8">
         <div className="w-full max-w-lg flex flex-col items-center space-y-6 text-center">
           {/* Scramble Heading with 3D depth zoom-out on hover */}
@@ -164,7 +166,7 @@ export default function RootEntryPage() {
               {/* Username Field */}
               <div className="space-y-1.5">
                 <label
-                  htmlFor="username"
+                  htmlFor="login-username"
                   className="block font-mono text-[11px] text-text-muted font-medium"
                 >
                   DIRECTOR USERNAME
@@ -172,7 +174,7 @@ export default function RootEntryPage() {
                 <div className="relative">
                   <User className="w-4 h-4 text-text-muted absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
-                    id="username"
+                    id="login-username"
                     type="text"
                     required
                     value={username}
@@ -187,7 +189,7 @@ export default function RootEntryPage() {
               {mode === "signup" && (
                 <div className="space-y-1.5">
                   <label
-                    htmlFor="email"
+                    htmlFor="login-email"
                     className="block font-mono text-[11px] text-text-muted font-medium"
                   >
                     EMAIL (OPTIONAL)
@@ -195,7 +197,7 @@ export default function RootEntryPage() {
                   <div className="relative">
                     <Mail className="w-4 h-4 text-text-muted absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
-                      id="email"
+                      id="login-email"
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -210,7 +212,7 @@ export default function RootEntryPage() {
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <label
-                    htmlFor="password"
+                    htmlFor="login-password"
                     className="block font-mono text-[11px] text-text-muted font-medium"
                   >
                     PASSWORD
@@ -228,7 +230,7 @@ export default function RootEntryPage() {
                 <div className="relative">
                   <Lock className="w-4 h-4 text-text-muted absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
-                    id="password"
+                    id="login-password"
                     type={showPassword ? "text" : "password"}
                     required
                     value={password}
@@ -289,5 +291,13 @@ export default function RootEntryPage() {
       {/* 4. Minimal Footer */}
       <Footer />
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-bg flex items-center justify-center font-mono text-xs text-accent-amber">Loading Director Gateway...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }

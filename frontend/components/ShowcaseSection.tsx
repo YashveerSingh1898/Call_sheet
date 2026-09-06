@@ -187,7 +187,7 @@ export default function ShowcaseSection() {
           </h2>
           <p className="font-body text-sm sm:text-base text-text-muted leading-relaxed">
             See how diverse brands across beverage, fashion, enterprise software, and athletic apparel 
-            generate complete commercial storyboards using Callsheet.
+            generate complete commercial storyboards using FrameZero.
           </p>
         </div>
 
